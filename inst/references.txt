@@ -1,0 +1,10 @@
+References
+
+important points:
+https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf
+
+Change points:
+file:///C:/Users/Prodipta/Downloads/v58i03%20(2).pdf
+http://www.lancs.ac.uk/~chapmanj/changepoints.pdf
+https://www.math.uwaterloo.ca/~jhchen/paper/Sankhya06.pdf
+https://arxiv.org/pdf/1101.1438.pdf
