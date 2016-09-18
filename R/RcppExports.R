@@ -5,6 +5,10 @@ cpt_trend <- function(x, y, Q, minseglen, penalty) {
     .Call('techchart_cpt_trend', PACKAGE = 'techchart', x, y, Q, minseglen, penalty)
 }
 
+houghtransform <- function(x1, y1, flag, rbucket, abucket) {
+    .Call('techchart_houghtransform', PACKAGE = 'techchart', x1, y1, flag, rbucket, abucket)
+}
+
 timesTwo <- function(x) {
     .Call('techchart_timesTwo', PACKAGE = 'techchart', x)
 }

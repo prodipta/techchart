@@ -77,7 +77,15 @@ cpt.trend <- function(x, Q, minseglen, penalty){
   z <- cpt_trend(y$x, y$y, Q, minseglen, penalty)
   z <- z[z!=0]
 
-  if(NROW(z)<1) stop("no change point found")
+  if(NROW(z)<1){
+    warning("No change point found, try relaxing parameters")
+    cpts <- list()
+    cpts$data <- x
+    cpts$cpts <- NULL
+    cpts$segments <- NULL
+    class(cpts) <- "cpttrend"
+    return(cpts)
+  }
   if(NROW(z)==Q){
     warning("number of change points found same as requested,
             consider increasing the value of Q or penalty")

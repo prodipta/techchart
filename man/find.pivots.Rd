@@ -2,7 +2,7 @@
 % Please edit documentation in R/supports.R
 \name{find.pivots}
 \alias{find.pivots}
-\title{supports and resitance from the chart of a time series}
+\title{Find supports and resitance fof a time series}
 \usage{
 find.pivots(x, type = c("SR", "FIB"), tolerance = 0.02, strength = 3,
   maxline = 10, lookback = 20)
@@ -24,6 +24,6 @@ find.pivots(x, type = c("SR", "FIB"), tolerance = 0.02, strength = 3,
 support/ resistance object (object of class supports)
 }
 \description{
-supports and resitance from the chart of a time series
+Find supports and resitance fof a time series
 }
 

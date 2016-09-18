@@ -19,29 +19,40 @@ print.summary.imppoints <- function(x,...){
   cat("extrement points:\n")
   print(paste("maxima:", NROW(x$maxima),"minima:",NROW(x$minima)))
   cat("Highs summary:\n")
-  print(summary(x$maxima))
+  print(summary(x$maxima$value))
   cat("Lows summary:\n")
-  print(summary(x$minima))
+  print(summary(x$minima$value))
 }
 #'@export
 plot.imppoints <- function(x, maxcol="green", mincol="red", ...){
   if(xts::is.xts(x$data)){
     if(quantmod::is.OHLC(x$data)){
-      plot(quantmod::Cl(x$data), main = "extreme points", xlab="x", ylab="y")
+      plot(quantmod::Cl(x$data), ...)
     }else{
-      plot(x$data[,1], main = "extreme points", xlab="x", ylab="y")
+      plot(x$data[,1], ...)
     }
     max.xy <- xts::as.xts(x$maxima[,2],zoo::index(x$data)[x$maxima[,1]])
     min.xy <- xts::as.xts(x$minima[,2],zoo::index(x$data)[x$minima[,1]])
     points(max.xy, col="black", pch = 24, bg=maxcol)
     points(min.xy, col="black", pch = 25, bg=mincol)
   } else{
-    plot(x$data, type = "n", main="extreme points", xlab="x", ylab="y")
+    plot(x$data, type ="n", ...)
     lines(x$data)
     points(x$maxima[,1],x$maxima[,2], col="black", pch = 24, bg=maxcol)
     points(x$minima[,1],x$minima[,2], col="black", pch = 25, bg=mincol)
   }
   Sys.sleep(0)
+}
+#'@export
+`[.imppoints` <- function(x,condition){
+  if(!xts::is.xts(x$data))stop("subsetting not allowed on non-xts input")
+  imppts <- list()
+  imppts$data <- x$data[condition,]
+  imppts$results <- x$results[condition,]
+  imppts$maxima <- x$maxima[condition,]
+  imppts$minima <- x$minima[condition,]
+  class(imppts) <- "imppoints"
+  return(imppts)
 }
 
 find.minima <- function(x, tolerance, lookback=20){
@@ -73,6 +84,7 @@ find.minima <- function(x, tolerance, lookback=20){
 
   y <- data.frame(findminima(as.numeric(x.min),as.numeric(x.max),threshold))
   y <- y[which(y[,2]!=0),]
+
   colnames(y) <- c("pos","sign")
   y$pos <- y$pos+1
   y$value <- as.numeric(x.min)[y$pos]
@@ -142,15 +154,18 @@ find.imppoints <- function(x, tolerance=0.02, lookback=20){
   rownames(z) <- seq(1:NROW(z))
   pts <- list()
   pts$data <- x
-  pts$results <- z
-  if(xts::is.xts(x)){
-    maxima <- xts::as.xts(z$value[which(z$sign==1)],zoo::index(x)[z$pos[which(z$sign==1)]])
-    minima <- xts::as.xts(z$value[which(z$sign==-1)],zoo::index(x)[z$pos[which(z$sign==-1)]])
-  } else{
-    maxima <- data.frame(x=z$pos[which(z$sign==1)],y=z$value[which(z$sign==1)])
-    minima <- data.frame(x=z$pos[which(z$sign==-1)],y=z$value[which(z$sign==-1)])
-  }
 
+  if(xts::is.xts(x)){
+    z <- xts::as.xts(z,zoo::index(x)[z$pos])
+    data <- data.frame(pos=z$pos[which(z$sign==1)],value=z$value[which(z$sign==1)])
+    maxima <- xts::as.xts(data,zoo::index(x)[z$pos[which(z$sign==1)]])
+    data <- data.frame(pos=z$pos[which(z$sign==-1)],value=z$value[which(z$sign==-1)])
+    minima <- xts::as.xts(data,zoo::index(x)[z$pos[which(z$sign==-1)]])
+  } else{
+    maxima <- data.frame(pos=z$pos[which(z$sign==1)],value=z$value[which(z$sign==1)])
+    minima <- data.frame(pos=z$pos[which(z$sign==-1)],value=z$value[which(z$sign==-1)])
+  }
+  pts$results <- z
   pts$maxima <- maxima
   pts$minima <- minima
   class(pts) <- "imppoints"
@@ -296,7 +311,7 @@ find.supports <- function(x, tolerance=0.02, strength=3, maxline=10,lookback=20)
   return(supports)
 }
 
-#' supports and resitance from the chart of a time series
+#' Find supports and resitance fof a time series
 #' @param x xts object, or vector, representing a time series
 #' @param type Either FIB (Fibonacci) or SR. SR is based on best fit lines of multiple peaks and troughs
 #' @param tolerance threshold for percentage change for extreme points
