@@ -107,3 +107,4 @@ find.lines <- function(x, flag, r.tol=0.02, theta.tol=2){
   xlines <- xlines[xlines$r != 0,]
   return(xlines)
 }
+
