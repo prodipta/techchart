@@ -8,7 +8,8 @@ print.cpttrend <- function(x,...){
 }
 
 #' @export
-summary.cpttrend <- function(x, ...){
+summary.cpttrend <- function(object, ...){
+  x <- object
   n <- NROW(x$cpts)+1
   seg.len <- rep(0,n)
   for(i in 1:n){
@@ -55,9 +56,16 @@ plot.cpttrend <- function(x,...){
 #' @param minseglen Minimum length of a trend segment
 #' @param penalty Penalty value, increasing it reduces number of segments
 #' @return change points data (object of class cpttrends)
+#' @examples
+#' x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+#' x <- x["2015/"]
+#' cpts <- cpt.trend(x,50,minseglen = 20, penalty = 5)
+#' summary(cpts)
+#' quantmod::chart_Series(x)
+#' quantmod::add_TA(cpts$segments[[NROW(cpts$segments)]],on=1,lty=3)
 #' @seealso \code{\link[changepoint]{cpt.mean}}
 #' @export
-cpt.trend <- function(x, Q, minseglen, penalty){
+cpt.trend <- function(x, Q=10, minseglen=10, penalty=1){
 
   if.xts <- F
   if(xts::is.xts(x)){

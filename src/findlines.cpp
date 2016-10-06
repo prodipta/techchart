@@ -6,6 +6,10 @@ using namespace Rcpp;
 double pi(){
   return(3.141593);
 }
+double abs(double x){
+  if(x<0)return (-x);
+  return x;
+}
 double variance(NumericVector x){
   int n = x.size();
   double total=0, var=0, avg;
@@ -25,7 +29,7 @@ int findmatch(double x, NumericVector r){
     if(x>=r[i-1] && x<r[i])
       return(i-1);
   }
-  return(n-1);
+  return -1;
 }
 IntegerMatrix localmaxima(IntegerMatrix mat, IntegerMatrix minmat,
                           IntegerMatrix maxmat, int nrow, int ncol, int s){
@@ -91,9 +95,9 @@ IntegerMatrix localmaxima(IntegerMatrix mat, IntegerMatrix minmat,
 }
 NumericVector envelopescore(IntegerMatrix lines, int n1, NumericVector x,
                             NumericVector y, NumericVector rbucket,
-                            NumericVector abucket, int flag){
+                            NumericVector abucket, int flag, int flag2){
 
-  int n2, start, end, count=0;
+  int n2, start, end, limit, count=0;
   double dist, r, theta, rquanta, mse=0;
   NumericVector score(n1);
 
@@ -103,8 +107,10 @@ NumericVector envelopescore(IntegerMatrix lines, int n1, NumericVector x,
   for(int i=0; i<n1; i++){
     start=lines.row(i)[3];
     end=lines.row(i)[4];
+    limit=end+1;
+    if(flag2)limit=n2;
     //length = end-start+1;
-    for(int j=start;j<(end+1); j++){
+    for(int j=start;j<limit; j++){
       if(j >= n2)break;
       r = rbucket[lines.row(i)[0]];
       theta = abucket[lines.row(i)[1]];
@@ -158,17 +164,18 @@ NumericVector fitscore(IntegerMatrix lines, int n1, NumericVector x,
 
 // [[Rcpp::export]]
 DataFrame houghtransform(NumericVector x1, NumericVector y1,int flag,
-                         NumericVector rbucket, NumericVector abucket){
+                         NumericVector rbucket, NumericVector abucket, int s){
 
   int k, n = x1.size();
   int nA = abucket.size(), nR = rbucket.size();
-  double r;
+  double r, r_step;
   IntegerMatrix accumulator(nR,nA);
   IntegerMatrix accumulatorMin(nR,nA);
   IntegerMatrix accumulatorMax(nR,nA);
   IntegerMatrix lines(nR*nA,5);
   NumericVector scores(nR*nA), fit(nR*nA);
 
+  r_step = (rbucket[nR-1]-rbucket[0])/(nR-1);
   for(int i=0; i< nR*nA; i++){
     accumulatorMax[i] = -1;
   }
@@ -176,7 +183,9 @@ DataFrame houghtransform(NumericVector x1, NumericVector y1,int flag,
   for(int i=0; i<n; i++){
     for(int j=0; j<nA; j++){
       r = x1[i]*cos(abucket[j]*pi()/180) + y1[i]*sin(abucket[j]*pi()/180);
-      k = findmatch(r, rbucket);
+      if(r<rbucket[0] || r > rbucket[nR-1]) continue;
+      //k = findmatch(r, rbucket);
+      k = round((r-rbucket[0])/r_step);
       accumulator.row(k)[j] = accumulator.row(k)[j] + 1;
       if(accumulatorMin.row(k)[j]==0){
         accumulatorMin.row(k)[j] = i;
@@ -186,8 +195,8 @@ DataFrame houghtransform(NumericVector x1, NumericVector y1,int flag,
       }
     }
   }
-  lines = localmaxima(accumulator,accumulatorMin, accumulatorMax,nR,nA,2);
-  scores = envelopescore(lines,nR*nA,x1,y1,rbucket,abucket,flag);
+  lines = localmaxima(accumulator,accumulatorMin, accumulatorMax,nR,nA,s);
+  scores = envelopescore(lines,nR*nA,x1,y1,rbucket,abucket,flag, true);
   fit = fitscore(lines,nR*nA,x1,y1,rbucket,abucket,flag);
 
   return DataFrame::create(_["r"]=lines.column(0), _["theta"]=lines.column(1),

@@ -4,7 +4,7 @@
 \alias{cpt.trend}
 \title{change point analysis using binary segmentation}
 \usage{
-cpt.trend(x, Q, minseglen, penalty)
+cpt.trend(x, Q = 10, minseglen = 10, penalty = 1)
 }
 \arguments{
 \item{x}{xts, dataframe, matrix or vector, representing a time series}
@@ -20,6 +20,14 @@ change points data (object of class cpttrends)
 }
 \description{
 change point analysis using binary segmentation
+}
+\examples{
+x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+x <- x["2015/"]
+cpts <- cpt.trend(x,50,minseglen = 20, penalty = 5)
+summary(cpts)
+quantmod::chart_Series(x)
+quantmod::add_TA(cpts$segments[[NROW(cpts$segments)]],on=1,lty=3)
 }
 \seealso{
 \code{\link[changepoint]{cpt.mean}}

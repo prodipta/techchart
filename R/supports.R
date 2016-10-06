@@ -7,7 +7,8 @@ print.imppoints <- function(x,...){
   print(x$results, ...)
 }
 #'@export
-summary.imppoints <- function(x, ...){
+summary.imppoints <- function(object, ...){
+  x <- object
   maxima <- x$maxima
   minima <- x$minima
   ret <- list(maxima=maxima, minima=minima)
@@ -127,9 +128,16 @@ find.maxima <- function(x, tolerance, lookback=20){
 
 #' time series extrema using important point algorithm
 #' @param x xts object or vector, representing a time series
-#' @param tolerance threshold for percentage change for extreme points
+#' @param tolerance threshold for percentage change or vol multiple for extreme points
 #' @param lookback Used for volatility dependent adaptive threshold
 #' @return important points data object (object of class imppoints)
+#' @examples
+#' x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+#' x <- x["2015/"]
+#' imppts <- find.imppoints(x,2)
+#' quantmod::chart_Series(x)
+#' points(as.numeric(imppts$maxima$pos),as.numeric(imppts$maxima$value),bg="green",pch=24,cex=1.25)
+#' points(as.numeric(imppts$minima$pos),as.numeric(imppts$minima$value),bg="red",pch=25,cex=1.25)
 #' @export
 find.imppoints <- function(x, tolerance=0.02, lookback=20){
   z1 <- find.minima(x,tolerance, lookback)
@@ -177,7 +185,8 @@ print.supports <- function(x,...){
   print(x$results, ...)
 }
 #'@export
-summary.supports <- function(x, ...){
+summary.supports <- function(object, ...){
+  x <- object
   resist<- x$results$value[which(x$results$value > x$lastpoint)]
   sups<- x$results$value[which(x$results$value < x$lastpoint)]
   resist <- sort(resist)
@@ -311,14 +320,23 @@ find.supports <- function(x, tolerance=0.02, strength=3, maxline=10,lookback=20)
   return(supports)
 }
 
-#' Find supports and resitance fof a time series
+#' Find supports and resitance for a time series
 #' @param x xts object, or vector, representing a time series
-#' @param type Either FIB (Fibonacci) or SR. SR is based on best fit lines of multiple peaks and troughs
-#' @param tolerance threshold for percentage change for extreme points
+#' @param type either FIB (Fibonacci) or SR. SR is based on best fit lines of multiple peaks and troughs
+#' @param tolerance threshold for percentage change or vol multiple for extreme points
 #' @param strength minimum number of extreme points defining a support
 #' @param maxline maximum number of support/ resistance lines to return
 #' @param lookback Used for volatility dependent adaptive threshold
 #' @return support/ resistance object (object of class supports)
+#' @examples
+#' x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+#' x <- x["2015/"]
+#' sups <- find.pivots(x, type = "FIB")
+#' summary(sups)
+#' sups <- find.pivots(x, type = "SR", strength = 5)
+#' summary(sups)
+#' quantmod::chart_Series(x)
+#' quantmod::add_TA(sups$lines[[1]],on=1, lty=2)
 #' @export
 find.pivots <- function(x, type=c("SR","FIB"), tolerance=0.02, strength=3, maxline=10, lookback=20){
   if(type=="SR"){

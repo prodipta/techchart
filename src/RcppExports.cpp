@@ -21,8 +21,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // houghtransform
-DataFrame houghtransform(NumericVector x1, NumericVector y1, int flag, NumericVector rbucket, NumericVector abucket);
-RcppExport SEXP techchart_houghtransform(SEXP x1SEXP, SEXP y1SEXP, SEXP flagSEXP, SEXP rbucketSEXP, SEXP abucketSEXP) {
+DataFrame houghtransform(NumericVector x1, NumericVector y1, int flag, NumericVector rbucket, NumericVector abucket, int s);
+RcppExport SEXP techchart_houghtransform(SEXP x1SEXP, SEXP y1SEXP, SEXP flagSEXP, SEXP rbucketSEXP, SEXP abucketSEXP, SEXP sSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -31,7 +31,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type flag(flagSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type rbucket(rbucketSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type abucket(abucketSEXP);
-    __result = Rcpp::wrap(houghtransform(x1, y1, flag, rbucket, abucket));
+    Rcpp::traits::input_parameter< int >::type s(sSEXP);
+    __result = Rcpp::wrap(houghtransform(x1, y1, flag, rbucket, abucket, s));
     return __result;
 END_RCPP
 }

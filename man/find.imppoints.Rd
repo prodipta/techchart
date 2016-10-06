@@ -9,7 +9,7 @@ find.imppoints(x, tolerance = 0.02, lookback = 20)
 \arguments{
 \item{x}{xts object or vector, representing a time series}
 
-\item{tolerance}{threshold for percentage change for extreme points}
+\item{tolerance}{threshold for percentage change or vol multiple for extreme points}
 
 \item{lookback}{Used for volatility dependent adaptive threshold}
 }
@@ -18,5 +18,13 @@ important points data object (object of class imppoints)
 }
 \description{
 time series extrema using important point algorithm
+}
+\examples{
+x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+x <- x["2015/"]
+imppts <- find.imppoints(x,2)
+quantmod::chart_Series(x)
+points(as.numeric(imppts$maxima$pos),as.numeric(imppts$maxima$value),bg="green",pch=24,cex=1.25)
+points(as.numeric(imppts$minima$pos),as.numeric(imppts$minima$value),bg="red",pch=25,cex=1.25)
 }
 

@@ -9,7 +9,7 @@ find.major.trends(x, penalty = 20)
 \arguments{
 \item{x}{xts, dataframe, matrix or vector, representing a time series}
 
-\item{penalty}{starting penalty value, should be aBIG number}
+\item{penalty}{starting penalty value, should be a BIG number (default 20)}
 }
 \value{
 change points data (object of class cpttrends)
