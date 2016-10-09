@@ -412,6 +412,7 @@ find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
   tchannel$type <- NA
   tchannel$dir <- NA
   tchannel$threshold <- NA
+  class(tchannel) <- "tchannel"
 
   if(NROW(xlines$maxlist)<1 | NROW(xlines$minlist)<1){
     warning("no envelopes found, try changing the tolerance, increasing n or pscore or reducing pfit")
@@ -472,10 +473,7 @@ find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
   if(tchannel$dir==1)tchannel$threshold <- maxx
   if(tchannel$dir==-1)tchannel$threshold <- minx
 
-  class(tchannel) <- "tchannel"
-
   return(tchannel)
-
 }
 
 #'@export
