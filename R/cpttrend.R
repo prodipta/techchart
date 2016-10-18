@@ -12,10 +12,19 @@ summary.cpttrend <- function(object, ...){
   x <- object
   n <- NROW(x$cpts)+1
   seg.len <- rep(0,n)
+  seg.return <- rep(0,n)
+  seg.offset <- rep(0,n)
   for(i in 1:n){
     seg.len[i] <- NROW(x$segments[[i]])
+    seg.return[i] <- annualize(x$segments[[i]])
+    if(i>1){
+      start <- as.numeric(x$segments[[i]][1])
+      end <- as.numeric(x$segments[[i-1]][NROW(x$segments[[i-1]])])
+      seg.offset[i] <- start/end -1
+    }
   }
-  y <- list(cpts=x$cpts, seg.len=seg.len)
+  y <- list(cpts=x$cpts, seg.len=seg.len, seg.return=seg.return,
+            seg.offset=seg.offset)
   class(y) <- "summary.cpttrend"
   return(y)
 }
@@ -24,8 +33,12 @@ summary.cpttrend <- function(object, ...){
 print.summary.cpttrend <- function(x,...){
   cat("change points:\n")
   print(x$cpts)
-  cat("segments summary:\n")
+  cat("segments length summary:\n")
   print(summary(x$seg.len))
+  cat("segments returns summary:\n")
+  cat(x$seg.return); cat("\n")
+  cat("segments offset summary:\n")
+  cat(x$seg.offset)
 }
 
 #' @export

@@ -1,5 +1,5 @@
 ---
-title: "Techchart: Technial Feature Extraction of Time Series Data"
+title: "Techchart: Technical Feature Extraction of Time Series Data"
 author: "Prodipta Ghosh"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -9,16 +9,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-The R package `techchart` is a collection of tools to extract features from time series data for technical analysis and related quantitative applications. While R is not the most suitable platform for carrying out technical analysis with human inputs, this package makes it possible to extract and match technical features and patter and use them to back-test trading ideas. At present, the package covers four major areas:
+The R package `techchart` is a collection of tools to extract features from time series data for technical analysis and related quantitative applications. While R is not the most suitable platform for carrying out technical analysis with human inputs, this package makes it possible to extract and match technical features and patterns and use them to back-test trading ideas. At present, the package covers four major areas:
 
 - Perceptually Important Points (PIPs) identification
-- Supports/resistance identification (either based on PIPs or the old-fashined Fibonacci method)
+- Supports/resistance identification (either based on PIPs or the old-fashioned Fibonacci method)
 - Change point analysis of trends and segmentation of time series based on underlying trend
 - Identification of technical envelopes (like trend channels or triangles) of a time series
 
 ## Perceptually Important Points
 
-PIPs are an effort to algorithmically derive a set of important points as perceived by a human to describe a time series. This typically can be a set of minima or maxima points or a set of turning points which are important from a feature extraction perspective. Traditional technical analysis - like technical pattern identification - relies heaviliy on PIPs.  In addition, a set of PIPs can be used to compress a time series in a very useful way. This compressed representation then can be used for comparing segments of time series (match finding) or other purposes. In this package, we have implemented the approach detailed [here](https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf).
+PIPs are an effort to algorithmically derive a set of important points as perceived by a human to describe a time series. This typically can be a set of minima or maxima points or a set of turning points which are important from a feature extraction perspective. Traditional technical analysis - like technical pattern identification - relies heavily on PIPs.  In addition, a set of PIPs can be used to compress a time series in a very useful way. This compressed representation then can be used for comparing segments of time series (match finding) or other purposes. In this package, we have implemented the approach detailed [here](https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf).
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
   warning = FALSE,
@@ -41,7 +41,7 @@ The function takes in a time series object (in xts format), and a tolerance leve
 
 ## Identification of Change Point in Linear (Deterministic) Trends
 
-Change point analysis has recently become an increasingly imortant tools for both financial and non-financial time series. There are quite a few packages in R to implement the major algorithms. However, most of them is focused on stationary time series, where in most cases the typical price series encountered in financial market will be non-stationary. The `cpt.trend` function in this package implement a change point analysis for non-stationary timeseries to identify multiple changes in the determinisctic linear trends. The implementation is based on identifying change in simple regression coefficients (with penalty) and extends to multiple change point identification through a the popular binary segmentation methodology. See [here](https://arxiv.org/pdf/1101.1438.pdf) for a discussion on different methods. The function `find.major.trends` extends this functionality to automatically search a time series for the most top level changes in trends by starting with a high value of penalty and decreasing in each step till a set of trends found.
+Change point analysis has recently become an increasingly important tools for both financial and non-financial time series. There are quite a few packages in R to implement the major algorithms. However, most of them is focused on stationary time series, where in most cases the typical price series encountered in financial market will be non-stationary. The `cpt.trend` function in this package implement a change point analysis for non-stationary time series to identify multiple changes in the deterministic linear trends. The implementation is based on identifying change in simple regression coefficients (with penalty) and extends to multiple change point identification using the popular binary segmentation methodology. See [here](https://arxiv.org/pdf/1101.1438.pdf) for a discussion on different methods. The function `find.major.trends` extends this functionality to automatically search a time series for the most top level changes in trends by starting with a high value of penalty and decreasing in each step till a set of trends found.
 
 ```{r}
 spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
@@ -55,7 +55,7 @@ quantmod::add_TA(cpts$segments[[2]],on=1,lty=3, col="red")
 
 ## Supports/ Resistance
 
-Supports and resistance levels are very popular tools for technical analysis. The function `find.pivots` implements a couple of ways to identify supports and resistance levels for a price series. Using the option `FIB` will produce a set of Fibonacci leveles around the most recent price point. The option `SR` will run an algorithm to find colinear points along x-axis (horizontal line) to find levels most tested in recent times. A set of levels as well as xts representaion of the lines defined by them are returned
+Supports and resistance levels are very popular tools for technical analysis. The function `find.pivots` implements a couple of ways to identify supports and resistance levels for a price series. Using the option `FIB` will produce a set of Fibonacci levels around the most recent price point. The option `SR` will run an algorithm to find co-linear points along x-axis (horizontal line) to find levels most tested in recent times. A set of levels as well as xts representation of the lines defined by them are returned
 
 ```{r, fig.show='hold'}
 spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)

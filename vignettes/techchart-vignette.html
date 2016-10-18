@@ -11,9 +11,9 @@
 
 <meta name="author" content="Prodipta Ghosh" />
 
-<meta name="date" content="2016-10-07" />
+<meta name="date" content="2016-10-09" />
 
-<title>Techchart: Technial Feature Extraction of Time Series Data</title>
+<title>Techchart: Technical Feature Extraction of Time Series Data</title>
 
 
 
@@ -68,23 +68,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="fluid-row" id="header">
 
 
-<h1 class="title">Techchart: Technial Feature Extraction of Time Series Data</h1>
+<h1 class="title">Techchart: Technical Feature Extraction of Time Series Data</h1>
 <h4 class="author"><em>Prodipta Ghosh</em></h4>
-<h4 class="date"><em>2016-10-07</em></h4>
+<h4 class="date"><em>2016-10-09</em></h4>
 
 </div>
 
 
-<p>The R package <code>techchart</code> is a collection of tools to extract features from time series data for technical analysis and related quantitative applications. While R is not the most suitable platform for carrying out technical analysis with human inputs, this package makes it possible to extract and match technical features and patter and use them to back-test trading ideas. At present, the package covers four major areas:</p>
+<p>The R package <code>techchart</code> is a collection of tools to extract features from time series data for technical analysis and related quantitative applications. While R is not the most suitable platform for carrying out technical analysis with human inputs, this package makes it possible to extract and match technical features and patterns and use them to back-test trading ideas. At present, the package covers four major areas:</p>
 <ul>
 <li>Perceptually Important Points (PIPs) identification</li>
-<li>Supports/resistance identification (either based on PIPs or the old-fashined Fibonacci method)</li>
+<li>Supports/resistance identification (either based on PIPs or the old-fashioned Fibonacci method)</li>
 <li>Change point analysis of trends and segmentation of time series based on underlying trend</li>
 <li>Identification of technical envelopes (like trend channels or triangles) of a time series</li>
 </ul>
 <div id="perceptually-important-points" class="section level2">
 <h2>Perceptually Important Points</h2>
-<p>PIPs are an effort to algorithmically derive a set of important points as perceived by a human to describe a time series. This typically can be a set of minima or maxima points or a set of turning points which are important from a feature extraction perspective. Traditional technical analysis - like technical pattern identification - relies heaviliy on PIPs. In addition, a set of PIPs can be used to compress a time series in a very useful way. This compressed representation then can be used for comparing segments of time series (match finding) or other purposes. In this package, we have implemented the approach detailed <a href="https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf">here</a>.</p>
+<p>PIPs are an effort to algorithmically derive a set of important points as perceived by a human to describe a time series. This typically can be a set of minima or maxima points or a set of turning points which are important from a feature extraction perspective. Traditional technical analysis - like technical pattern identification - relies heavily on PIPs. In addition, a set of PIPs can be used to compress a time series in a very useful way. This compressed representation then can be used for comparing segments of time series (match finding) or other purposes. In this package, we have implemented the approach detailed <a href="https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf">here</a>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">spx &lt;-<span class="st"> </span>quantmod::<span class="kw">getSymbols</span>(<span class="st">&quot;^GSPC&quot;</span>, <span class="dt">auto.assign =</span> <span class="ot">FALSE</span>)
 spx &lt;-<span class="st"> </span>spx[<span class="st">&quot;2014::2015&quot;</span>]
 imppts &lt;-<span class="st"> </span>techchart::<span class="kw">find.imppoints</span>(spx,<span class="dv">2</span>)
@@ -102,7 +102,7 @@ imppts &lt;-<span class="st"> </span>techchart::<span class="kw">find.imppoints<
 </div>
 <div id="identification-of-change-point-in-linear-deterministic-trends" class="section level2">
 <h2>Identification of Change Point in Linear (Deterministic) Trends</h2>
-<p>Change point analysis has recently become an increasingly imortant tools for both financial and non-financial time series. There are quite a few packages in R to implement the major algorithms. However, most of them is focused on stationary time series, where in most cases the typical price series encountered in financial market will be non-stationary. The <code>cpt.trend</code> function in this package implement a change point analysis for non-stationary timeseries to identify multiple changes in the determinisctic linear trends. The implementation is based on identifying change in simple regression coefficients (with penalty) and extends to multiple change point identification through a the popular binary segmentation methodology. See <a href="https://arxiv.org/pdf/1101.1438.pdf">here</a> for a discussion on different methods. The function <code>find.major.trends</code> extends this functionality to automatically search a time series for the most top level changes in trends by starting with a high value of penalty and decreasing in each step till a set of trends found.</p>
+<p>Change point analysis has recently become an increasingly important tools for both financial and non-financial time series. There are quite a few packages in R to implement the major algorithms. However, most of them is focused on stationary time series, where in most cases the typical price series encountered in financial market will be non-stationary. The <code>cpt.trend</code> function in this package implement a change point analysis for non-stationary time series to identify multiple changes in the deterministic linear trends. The implementation is based on identifying change in simple regression coefficients (with penalty) and extends to multiple change point identification using the popular binary segmentation methodology. See <a href="https://arxiv.org/pdf/1101.1438.pdf">here</a> for a discussion on different methods. The function <code>find.major.trends</code> extends this functionality to automatically search a time series for the most top level changes in trends by starting with a high value of penalty and decreasing in each step till a set of trends found.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">spx &lt;-<span class="st"> </span>quantmod::<span class="kw">getSymbols</span>(<span class="st">&quot;^GSPC&quot;</span>, <span class="dt">auto.assign =</span> <span class="ot">FALSE</span>)
 spx &lt;-<span class="st"> </span>spx[<span class="st">&quot;2014::2015&quot;</span>]
 cpts &lt;-<span class="st"> </span>techchart::<span class="kw">find.major.trends</span>(spx)
@@ -121,7 +121,7 @@ cpts &lt;-<span class="st"> </span>techchart::<span class="kw">find.major.trends
 </div>
 <div id="supports-resistance" class="section level2">
 <h2>Supports/ Resistance</h2>
-<p>Supports and resistance levels are very popular tools for technical analysis. The function <code>find.pivots</code> implements a couple of ways to identify supports and resistance levels for a price series. Using the option <code>FIB</code> will produce a set of Fibonacci leveles around the most recent price point. The option <code>SR</code> will run an algorithm to find colinear points along x-axis (horizontal line) to find levels most tested in recent times. A set of levels as well as xts representaion of the lines defined by them are returned</p>
+<p>Supports and resistance levels are very popular tools for technical analysis. The function <code>find.pivots</code> implements a couple of ways to identify supports and resistance levels for a price series. Using the option <code>FIB</code> will produce a set of Fibonacci levels around the most recent price point. The option <code>SR</code> will run an algorithm to find co-linear points along x-axis (horizontal line) to find levels most tested in recent times. A set of levels as well as xts representation of the lines defined by them are returned</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">spx &lt;-<span class="st"> </span>quantmod::<span class="kw">getSymbols</span>(<span class="st">&quot;^GSPC&quot;</span>, <span class="dt">auto.assign =</span> <span class="ot">FALSE</span>)
 spx &lt;-<span class="st"> </span>spx[<span class="st">&quot;2014::2015&quot;</span>]
 sups &lt;-<span class="st"> </span>techchart::<span class="kw">find.pivots</span>(spx, <span class="dt">type =</span> <span class="st">&quot;FIB&quot;</span>)

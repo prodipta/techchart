@@ -18,7 +18,7 @@ NumericVector timesTwo(NumericVector x) {
 
 double max(NumericVector x){
   int n = x.size();
-  double xmax = x[1];
+  double xmax = x[0];
   for(int i=0;i<n;i++){
     if(x[i]>xmax){
       xmax = x[i];
@@ -28,7 +28,7 @@ double max(NumericVector x){
 }
 double min(NumericVector x){
   int n = x.size();
-  double xmin = x[1];
+  double xmin = x[0];
   for(int i=0;i<n;i++){
     if(x[i]<xmin){
       xmin = x[i];
