@@ -34,7 +34,7 @@ summary(sups)
 ## ------------------------------------------------------------------------
 spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
 spx <- spx["2016-01-01::2016-09-30"]
-tchannel <- techchart::find.tchannel(spx,1.25)
+tchannel <- techchart::find.trend.channel(spx)
 tchannel
 quantmod::chart_Series(spx)
 quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1, lty=3, col="brown")

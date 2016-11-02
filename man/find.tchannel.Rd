@@ -2,7 +2,7 @@
 % Please edit documentation in R/findlines.R
 \name{find.tchannel}
 \alias{find.tchannel}
-\title{Find most current best-fit enveloping lines of a given time series}
+\title{Find most current enveloping lines of a given time series}
 \usage{
 find.tchannel(x, tolerance = 1.5, n = 3, pscore = (0.05)^2, pfit = 0.85)
 }
@@ -21,13 +21,13 @@ find.tchannel(x, tolerance = 1.5, n = 3, pscore = (0.05)^2, pfit = 0.85)
 returns the trend channel object (of type class tchannel)
 }
 \description{
-Find most current best-fit enveloping lines of a given time series
+Find most current enveloping lines of a given time series
 }
 \examples{
 x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
-x <- x["2015/"]
+spx <- spx["2016-01-01::2016-09-30"]
 quantmod::chart_Series(x)
-tchannel <- find.tchannel(x)
+tchannel <- find.tchannel(x,1.1)
 tchannel
 quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1)
 quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1)

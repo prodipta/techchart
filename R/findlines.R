@@ -385,7 +385,7 @@ find.lines <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2, pfit=0.85,
 
 }
 
-#' Find most current best-fit enveloping lines of a given time series
+#' Find most current enveloping lines of a given time series
 #' @param x xts object representing a time series
 #' @param tolerance tolerance specification for important points, expressed as times the standard deviation
 #' @param n number of lines to to choose the best ones from
@@ -394,9 +394,9 @@ find.lines <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2, pfit=0.85,
 #' @return returns the trend channel object (of type class tchannel)
 #' @examples
 #' x <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
-#' x <- x["2015/"]
+#' spx <- spx["2016-01-01::2016-09-30"]
 #' quantmod::chart_Series(x)
-#' tchannel <- find.tchannel(x)
+#' tchannel <- find.tchannel(x,1.1)
 #' tchannel
 #' quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1)
 #' quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1)
@@ -405,13 +405,28 @@ find.lines <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2, pfit=0.85,
 find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
                                pfit=0.85){
 
+  if(!xts::is.xts(x))stop("expected xts object")
+  if(!quantmod::is.OHLC(x)){
+    x <- merge(x[,1],x[,1],x[,1],x[,1])
+    colnames(x) <- c("open","high","low","close")
+  }
+
   try(xlines <- find.lines(x, tolerance, pscore, pfit, force.one = TRUE))
   tchannel <- list()
-  tchannel$xlines <- xlines
+  tchannel$xlines <- NA
   tchannel$name <- NA
-  tchannel$type <- NA
   tchannel$dir <- NA
-  tchannel$threshold <- NA
+  tchannel$upperlimit <- NA
+  tchannel$lowerlimit <- NA
+  tchannel$duration <- NA
+  tchannel$midlinemove <- NA
+  tchannel$maxlinemove <-NA
+  tchannel$minlinemove <- NA
+  tchannel$length <- NA
+  tchannel$aspectratio <- NA
+  tchannel$score <- NA
+  tchannel$strength <- NA
+  tchannel$fit <- NA
   class(tchannel) <- "tchannel"
 
   if(NROW(xlines$maxlist)<1 | NROW(xlines$minlist)<1){
@@ -419,19 +434,35 @@ find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
     return(tchannel)
   }
 
+  if(NROW(xlines$maxlines[[1]]) <2 |NROW(xlines$minlines[[1]]) <2 ){
+    warning("no envelopes found, try changing the tolerance, increasing n or pscore or reducing pfit")
+    return(tchannel)
+  }
+
+  last.maxday <- zoo::index(xlines$maxlines[[1]])[NROW(xlines$maxlines[[1]])]
+  last.minday <- zoo::index(xlines$minlines[[1]])[NROW(xlines$minlines[[1]])]
+  last.day <- zoo::index(x)[NROW(x)]
+  if(last.maxday != last.minday | last.maxday != last.day){
+    warning("no envelopes found, try changing the tolerance, increasing n or pscore or reducing pfit")
+    return(tchannel)
+  }
+
   maxx <- as.numeric(xlines$maxlines[[1]][NROW(xlines$maxlines[[1]])])
   minx <- as.numeric(xlines$minlines[[1]][NROW(xlines$minlines[[1]])])
-
   if(maxx < minx)return(tchannel)
-
-  vol <- sd(na.omit(TTR::ROC(quantmod::Cl(x)))); tol <- 0.25*vol
 
   idx <- max(zoo::index(xlines$maxlines[[1]])[1],zoo::index(xlines$minlines[[1]])[1])
   max0 <- as.numeric(xlines$maxlines[[1]][idx])
   min0 <- as.numeric(xlines$minlines[[1]][idx])
+  if(max0 < min0)return(tchannel)
+
   startdev <- 100*(max0/min0-1)
   enddev <- 100*(maxx/minx-1)
+  vol <- sd(na.omit(TTR::ROC(quantmod::Cl(x)))); tol <- 0.25*vol
+  duration <- min(NROW(xlines$maxlines[[1]]),NROW(xlines$minlines[[1]]))
+  duration <- duration/(NROW(x))
 
+  #find the channel type and direction
   if(startdev > enddev & abs(startdev-enddev)>(100*tol)){
     tchannel$name <- "triangle"
   } else if(startdev < enddev & abs(startdev-enddev)>(100*tol)){
@@ -440,38 +471,35 @@ find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
     tchannel$name <- "channel"
   }
 
-  startmean <- mean(min0,max0)
-  endmean <- mean(minx,maxx)
+  startmean <- 0.5*(min0+max0)
+  endmean <- 0.5*(minx+maxx)
 
   if(startmean < endmean & abs(endmean/startmean-1)>tol ){
-    if(tchannel$name == "triangle"){
-      tchannel$type <- "continuation"
-      tchannel$dir <- 1
-    }else if(tchannel$name == "megaphone"){
-      tchannel$type <- "breakout"
-      tchannel$dir <- -1
-    } else{
-      tchannel$type <- "neutral"
-      tchannel$dir <- 0
-    }
+    tchannel$dir <- 1
   } else if(startmean > endmean & abs(endmean/startmean-1)>tol){
-    if(tchannel$name == "triangle"){
-      tchannel$type <- "continuation"
-      tchannel$dir <- -1
-    }else if(tchannel$name == "megaphone"){
-      tchannel$type <- "breakout"
-      tchannel$dir <- 1
-    } else{
-      tchannel$type <- "neutral"
-      tchannel$dir <- 0
-    }
+    tchannel$dir <- -1
   } else{
-    tchannel$type <- "neutral"
     tchannel$dir <- 0
   }
 
-  if(tchannel$dir==1)tchannel$threshold <- maxx
-  if(tchannel$dir==-1)tchannel$threshold <- minx
+  # add the lines data
+  tchannel$xlines <- xlines
+  tchannel$midlinemove <- endmean/startmean
+  tchannel$minlinemove <- minx/min0
+  tchannel$maxlinemove <- maxx/max0
+
+  #find the limiting points
+  tchannel$upperlimit <- maxx
+  tchannel$lowerlimit <- minx
+  tchannel$duration <- duration
+
+  #aesthetic parameters
+  tchannel$length <- max(NROW(xlines$maxlines[[1]])/NROW(xlines$minlines[[1]]),
+                              NROW(xlines$minlines[[1]])/NROW(xlines$maxlines[[1]]))
+  tchannel$aspectratio <- max((maxx-minx)/(max0-min0),(max0-min0)/(maxx-minx))
+  tchannel$score <- max(tchannel$xlines$maxlist$score[1],tchannel$xlines$minlist$score[1])
+  tchannel$strength <- min(tchannel$xlines$maxlist$strength[1],tchannel$xlines$minlist$strength[1])
+  tchannel$fit <- min(tchannel$xlines$maxlist$fit[1],tchannel$xlines$minlist$fit[1])
 
   return(tchannel)
 }
@@ -479,7 +507,30 @@ find.tchannel <- function(x, tolerance=1.5, n=3, pscore=(0.05)^2,
 #'@export
 print.tchannel <- function(x,...){
   cat(paste("name:",x$name)); cat("\n")
-  cat(paste("type:",x$type)); cat("\n")
+  #cat(paste("type:",x$type)); cat("\n")
   cat(paste("direction:",x$dir)); cat("\n")
-  cat(paste("threshold:",round(x$threshold,3)))
+  cat(paste("upper limit:",round(x$upperlimit,3))); cat("\n")
+  cat(paste("lower limit:",round(x$lowerlimit,3))); cat("\n")
+  cat(paste("duration ratio:",round(x$duration,3))); cat("\n")
+  cat(paste("aesthetics - aspect ratio:",round(x$aspectratio,2),"score:",round(x$score,2),
+            "fit:",round(x$fit,2), "strength:", x$strength))
+}
+
+#'@export
+summary.tchannel <- function(object, ...){
+  x <- object
+  x$xlines <- NULL
+  return(x)
+}
+
+#'@export
+print.summary.tchannel <- function(x,...){
+  cat(paste("name:",x$name)); cat("\n")
+  #cat(paste("type:",x$type)); cat("\n")
+  cat(paste("direction:",x$dir)); cat("\n")
+  cat(paste("upper limit:",round(x$upperlimit,3))); cat("\n")
+  cat(paste("lower limit:",round(x$lowerlimit,3))); cat("\n")
+  cat(paste("duration ratio:",round(x$duration,3))); cat("\n")
+  cat(paste("aesthetics - aspect ratio:",round(x$aspectratio,2),"score:",round(x$score,2),
+            "fit:",round(x$fit,2), "strength:", x$strength))
 }

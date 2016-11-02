@@ -69,12 +69,12 @@ summary(sups)
 
 ## Price Envelop Identification
 
-Price envelopes features are an integral part of technical analysis. For example technical analysts look for features like trending channel, or ascending triangles etc to identify continuation or breakout from current price actions. The function `find.tchannel` identifies the most recent such envelopes using an implementation of the popular Hough transform algorithm in image processing, along with some heuristics.
+Price envelopes features are an integral part of technical analysis. For example technical analysts look for features like trending channel, or ascending triangles etc to identify continuation or breakout from current price actions. The function `find.tchannel` identifies the most recent such envelopes using an implementation of the popular Hough transform algorithm in image processing, along with some heuristics. The wrapper function `find.trend.channel` returns the best-fit such envelope.
 
 ```{r}
 spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
 spx <- spx["2016-01-01::2016-09-30"]
-tchannel <- techchart::find.tchannel(spx,1.25)
+tchannel <- techchart::find.trend.channel(spx)
 tchannel
 quantmod::chart_Series(spx)
 quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1, lty=3, col="brown")

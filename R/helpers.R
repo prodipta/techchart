@@ -1,8 +1,8 @@
 annualize <- function(x){
-  if(!is.xts(x) | NROW(x)<2){
+  if(!xts::is.xts(x) | NROW(x)<2){
     stop("input is not in xts format or has less than 2 points")
   }
-  period <- as.double(index(x)[NROW(x)] - index(x)[1])
+  period <- as.double(zoo::index(x)[NROW(x)] - zoo::index(x)[1])
   years <- period/365.25
   r <- as.numeric(x[NROW(x),1])/as.numeric(x[1,1])
   r <- (r)^(1/years) - 1
@@ -33,6 +33,59 @@ find.major.trends <- function(x,penalty=20){
   }
   return(cpts)
 }
+
+#' Find the last best-fit enveloping lines of a given time series
+#' @param x xts object representing a time series
+#' @return returns the trend channel object (of type class tchannel)
+#' @seealso \code{\link[techchart]{find.tchannel}}
+#' @export
+find.trend.channel <- function(x, tscore=(0.25)^2){
+  tolerance <- seq(1.1,1.5,0.05)
+  error_threshold <- tscore
+  score <- 999
+
+  # set up the return object
+  tchannel <- list()
+  tchannel$xlines <- NA
+  tchannel$name <- NA
+  tchannel$dir <- NA
+  tchannel$upperlimit <- NA
+  tchannel$lowerlimit <- NA
+  tchannel$duration <- NA
+  tchannel$midlinemove <- NA
+  tchannel$maxlinemove <-NA
+  tchannel$minlinemove <- NA
+  tchannel$aspectratio <- NA
+  tchannel$score <- NA
+  tchannel$strength <- NA
+  tchannel$fit <- NA
+  class(tchannel) <- "tchannel"
+  na_tchannel <- tchannel
+
+  for(tol in tolerance){
+    tryCatch({
+      new_tchannel <- find.tchannel(x,tol)
+      if(!is.na(new_tchannel$name)){
+        if(new_tchannel$score >= score){
+          if(score < error_threshold)return(tchannel)
+          next
+        }
+        tchannel <- new_tchannel
+        score <- tchannel$score
+      }
+    }, error=function(cond){
+      # do nothing
+    }, warning=function(w){
+      # do nothing
+    })
+  }
+
+  if(!is.na(tchannel$score)){
+    if(tchannel$score < (1.5*error_threshold))return(tchannel)
+  }
+  return(na_tchannel)
+}
+
 
 
 #' Find the past, current and forming technical patter

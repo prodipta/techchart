@@ -97,9 +97,9 @@ find.tpattern <- function(x, pattern=pattern.db("HS")[[1]], tolerance=0.25,
   }
 
   if(quantmod::is.OHLC(x)){
-    ret <- na.omit(ROC(Cl(x)))
+    ret <- na.omit(TTR::ROC(quantmod::Cl(x)))
   } else{
-    ret <- na.omit(ROC(x[,1]))
+    ret <- na.omit(TTR::ROC(x[,1]))
   }
   vol <- sd(ret)
   tolerance <- vol*tolerance
@@ -133,7 +133,7 @@ find.tpattern <- function(x, pattern=pattern.db("HS")[[1]], tolerance=0.25,
       assign(paste("T",j,sep=""),as.numeric(z$pos[k+j-1]),envir=pattern.env)
     }
     # assign control variables
-    curren.point <- ifelse(is.OHLC(x),Cl(x)[NROW(x)],x[NROW(x),1])
+    curren.point <- ifelse(quantmod::is.OHLC(x),quantmod::Cl(x)[NROW(x)],x[NROW(x),1])
     assign("tolerance",tolerance,envir=pattern.env)
     assign("tchart.trend.adjusted",trend.adjusted,envir=pattern.env)
     assign("current.point", as.numeric(curren.point),envir = pattern.env)
@@ -146,16 +146,16 @@ find.tpattern <- function(x, pattern=pattern.db("HS")[[1]], tolerance=0.25,
         x.out <- z$pos[k]:z$pos[k+pattern$length-1]
         x.out.idx <- idx[z$pos[k]:z$pos[k+pattern$length-1]]
         y.out <- approx(x.in,y.in,x.out, n=NROW(x.out))
-        patterns.out <- as.xts(y.out$y, x.out.idx)
+        patterns.out <- xts::as.xts(y.out$y, x.out.idx)
         colnames(patterns.out) <- c("pattern")
-        points.out <- as.xts(y.in, x.in.idx)
+        points.out <- xts::as.xts(y.in, x.in.idx)
         colnames(points.out) <- c("points")
         n <- n+1; matches[[n]] <- list(data=patterns.out,points=points.out)
       }
     }, error=function(e){
       #cat(paste("loop:",k,"\n"))
       #print(e)
-      #print(index(x)[NROW(x)])
+      #print(zoo::index(x)[NROW(x)])
       #print(tail(z))
       #print(c(pattern.env$E1,pattern.env$E2,pattern.env$E3,pattern.env$E4))
     }
