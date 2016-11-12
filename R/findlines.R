@@ -39,7 +39,7 @@ merge_lines <- function(xlines, tolerance=2){
   #return if only one member
   if(NROW(xlines)<2)return(xlines)
   # cluster along start and end lines
-  d <- unique(xlines$end);
+  d <- na.omit(unique(xlines$end));
   # if less than two, no clustering
   if(NROW(d)<2)return(xlines)
 
@@ -47,7 +47,9 @@ merge_lines <- function(xlines, tolerance=2){
   cluster <- hclust(dist(d))
   d1 <- cluster_grouping(d,cluster,2*tolerance, FUN="max",FALSE)
   endtag <- d1[match(xlines$end,d)]
-  d <- unique(xlines$start); cluster <- hclust(dist(d))
+  d <- unique(xlines$start)
+  if(NROW(d)<2)return(xlines)
+  cluster <- hclust(dist(d))
   d1 <- cluster_grouping(d,cluster,2*tolerance, FUN="min",FALSE)
   starttag <- d1[match(xlines$start,d)]
 
