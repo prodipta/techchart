@@ -1,0 +1,84 @@
+---
+title: "Techchart: Technical Feature Extraction of Time Series Data"
+author: "Prodipta Ghosh"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+The R package `techchart` is a collection of tools to extract features from time series data for technical analysis and related quantitative applications. While R is not the most suitable platform for carrying out technical analysis with human inputs, this package makes it possible to extract and match technical features and patterns and use them to back-test trading ideas. At present, the package covers four major areas:
+
+- Perceptually Important Points (PIPs) identification
+- Supports/resistance identification (either based on PIPs or the old-fashioned Fibonacci method)
+- Change point analysis of trends and segmentation of time series based on underlying trend
+- Identification of technical envelopes (like trend channels or triangles) of a time series
+
+## Perceptually Important Points
+
+PIPs are an effort to algorithmically derive a set of important points as perceived by a human to describe a time series. This typically can be a set of minima or maxima points or a set of turning points which are important from a feature extraction perspective. Traditional technical analysis - like technical pattern identification - relies heavily on PIPs.  In addition, a set of PIPs can be used to compress a time series in a very useful way. This compressed representation then can be used for comparing segments of time series (match finding) or other purposes. In this package, we have implemented the approach detailed [here](https://www.cs.cmu.edu/~eugene/research/full/search-series.pdf).
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  fig.align = "center"
+)
+```
+```{r, fig.show='hold', fig.width = 5}
+spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+spx <- spx["2014::2015"]
+imppts <- techchart::find.imppoints(spx,2)
+head(imppts)
+quantmod::chart_Series(spx)
+points(as.numeric(imppts$maxima$pos),as.numeric(imppts$maxima$value),bg="green",pch=24,cex=1.25)
+points(as.numeric(imppts$minima$pos),as.numeric(imppts$minima$value),bg="red",pch=25,cex=1.25)
+```
+
+
+The function takes in a time series object (in xts format), and a tolerance level for extreme points identification (can be either a percentage or a multiple of standard deviation). It returns an object which has the list of all PIPs identified, marked by either a -1 (minima) or 1 (maxima), as well as the maxima and minima points separately as xts objects
+
+## Identification of Change Point in Linear (Deterministic) Trends
+
+Change point analysis has recently become an increasingly important tools for both financial and non-financial time series. There are quite a few packages in R to implement the major algorithms. However, most of them is focused on stationary time series, where in most cases the typical price series encountered in financial market will be non-stationary. The `cpt.trend` function in this package implement a change point analysis for non-stationary time series to identify multiple changes in the deterministic linear trends. The implementation is based on identifying change in simple regression coefficients (with penalty) and extends to multiple change point identification using the popular binary segmentation methodology. See [here](https://arxiv.org/pdf/1101.1438.pdf) for a discussion on different methods. The function `find.major.trends` extends this functionality to automatically search a time series for the most top level changes in trends by starting with a high value of penalty and decreasing in each step till a set of trends found.
+
+```{r}
+spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+spx <- spx["2014::2015"]
+cpts <- techchart::find.major.trends(spx)
+summary(cpts)
+quantmod::chart_Series(spx)
+quantmod::add_TA(cpts$segments[[1]],on=1,lty=3, col="red")
+quantmod::add_TA(cpts$segments[[2]],on=1,lty=3, col="red")
+```
+
+## Supports/ Resistance
+
+Supports and resistance levels are very popular tools for technical analysis. The function `find.pivots` implements a couple of ways to identify supports and resistance levels for a price series. Using the option `FIB` will produce a set of Fibonacci levels around the most recent price point. The option `SR` will run an algorithm to find co-linear points along x-axis (horizontal line) to find levels most tested in recent times. A set of levels as well as xts representation of the lines defined by them are returned
+
+```{r, fig.show='hold'}
+spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+spx <- spx["2014::2015"]
+sups <- techchart::find.pivots(spx, type = "FIB")
+summary(sups)
+sups <- techchart::find.pivots(spx, type = "SR", strength = 5)
+summary(sups)
+```
+
+
+## Price Envelop Identification
+
+Price envelopes features are an integral part of technical analysis. For example technical analysts look for features like trending channel, or ascending triangles etc to identify continuation or breakout from current price actions. The function `find.tchannel` identifies the most recent such envelopes using an implementation of the popular Hough transform algorithm in image processing, along with some heuristics. The wrapper function `find.trend.channel` returns the best-fit such envelope.
+
+```{r}
+spx <- quantmod::getSymbols("^GSPC", auto.assign = FALSE)
+spx <- spx["2016-01-01::2016-09-30"]
+tchannel <- techchart::find.trend.channel(spx)
+tchannel
+quantmod::chart_Series(spx)
+quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1, lty=3, col="brown")
+quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1, lty=3, col="brown")
+```
+
+The function returns an object with parameters of the envelopes found (if any), as well as the xts representation of the envelopes lines

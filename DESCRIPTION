@@ -1,0 +1,18 @@
+Package: techchart
+Type: Package
+Title: Package to carry out automated technical charting analysis
+Version: 0.1.0
+Author: Prodipta Ghosh <prodiptag@gmail.com>
+Maintainer: Prodipta Ghosh <prodiptag@gmail.com>
+Description: Analyze stock charts, automatically spot technical patterns
+  , and generate trading signals and reports based on chart pattern analysis.
+License: file LICENSE
+LazyData: TRUE
+Depends: R (>= 2.10), stats
+Imports:
+    Rcpp (>= 0.12.6), Hmisc, xts, zoo, quantmod, TTR
+LinkingTo: Rcpp
+RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
