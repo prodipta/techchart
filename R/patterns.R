@@ -30,7 +30,7 @@ pattern.db <- function(type="all"){
   aspect.2 <- quote((R[5]-R[4])/(R[3]-R[2]))
   plot <- list(color=adjustcolor("red",alpha.f = 0.4),lwd=5)
   patterns$HS <- list(name=name, call=call.expr, length=length, start=start,
-                      threshold=threshold, plot=plot)
+                      threshold=threshold, plot=plot, aspect.1=aspect.1, aspect.2=aspect.2)
 
   #Inverse Head and Shoulder
   name = "Inverse head and shoulder"
@@ -51,7 +51,7 @@ pattern.db <- function(type="all"){
   aspect.2 <- quote((R[5]-R[4])/(R[3]-R[2]))
   plot <- list(color=adjustcolor("blue",alpha.f = 0.4),lwd=5)
   patterns$IHS <- list(name=name, call=call.expr, length=length, start=start,
-                       threshold=threshold, plot=plot)
+                       threshold=threshold, plot=plot, aspect.1=aspect.1, aspect.2=aspect.2)
 
   #Broadening Top
   name = "Broadening top"
@@ -67,7 +67,7 @@ pattern.db <- function(type="all"){
   aspect.2 <- quote((R[5]-R[4])/(R[3]-R[2]))
   plot <- list(color=adjustcolor("orange",alpha.f = 0.4),lwd=5)
   patterns$BTOP <- list(name=name, call=call.expr, length=length, start=start,
-                        threshold=threshold, plot=plot)
+                        threshold=threshold, plot=plot, aspect.1=aspect.1, aspect.2=aspect.2)
 
   #Broadening Bottom
   name = "Broadening bottom"
@@ -83,7 +83,7 @@ pattern.db <- function(type="all"){
   aspect.2 <- quote((R[5]-R[4])/(R[3]-R[2]))
   plot <- list(color=adjustcolor("brown",alpha.f = 0.4),lwd=5)
   patterns$BBOT <- list(name=name, call=call.expr, length=length, start=start,
-                        threshold=threshold, plot=plot)
+                        threshold=threshold, plot=plot, aspect.1=aspect.1, aspect.2=aspect.2)
 
   #done, now check and return required patterns
   ret.patterns <- list()
@@ -185,10 +185,11 @@ find.tpattern <- function(x, pattern=pattern.db("HS")[[1]], tolerance=0.25,
         move <- annualize(patterns.out)
         duration <- as.double(zoo::index(patterns.out)[NROW(patterns.out)]
                               - zoo::index(patterns.out)[1])
+        type= "complete"
         n <- n+1; matches[[n]] <- list(data=patterns.out,points=points.out,
                                        name=name, move=move, duration=duration,
                                        threshold=threshold, aspect.1=aspect.1,
-                                       aspect.2=aspect.2, date=xdate)
+                                       aspect.2=aspect.2, date=xdate, type=type)
       }
     }, error=function(e){
       #cat(paste("loop:",k,"\n"))
@@ -212,6 +213,7 @@ print.tpattern <- function(x,...){
     y <- x$matches[[i]]
     cat(paste("------pattern matched on:",y$date,"--------")); cat("\n")
     cat(paste("name:",y$name)); cat("\n")
+    cat(paste("type:",y$type)); cat("\n")
     cat(paste("move:",round(100*y$move,2)),"(percentage annualized)"); cat("\n")
     cat(paste("threshold:",round(y$threshold,2))); cat("\n")
     cat(paste("duration:",round(y$duration,2)),"(days)"); cat("\n")
@@ -231,6 +233,7 @@ print.summary.tpattern <- function(x,...){
     y <- x$matches[[i]]
     cat(paste("------pattern matched on:",y$date,"--------")); cat("\n")
     cat(paste("name:",y$name)); cat("\n")
+    cat(paste("type:",y$type)); cat("\n")
     cat(paste("move:",round(100*y$move,2)),"(percentage annualized)"); cat("\n")
     cat(paste("threshold:",round(y$threshold,2))); cat("\n")
     cat(paste("duration:",round(y$duration,2)),"(days)"); cat("\n")

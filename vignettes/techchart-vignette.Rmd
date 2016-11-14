@@ -82,3 +82,18 @@ quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1, lty=3, col="brown")
 ```
 
 The function returns an object with parameters of the envelopes found (if any), as well as the xts representation of the envelopes lines
+
+## Technical Pattern Identification
+
+Technical pattern identification implementation is based on PIPs. See [here](http://web.mit.edu/people/wangj/pap/LoMamayskyWang00.pdf) for a discussion on the basic aproach. Note we here replace the kernel smoothing based algorithm with PIPs, which appears more robust. The function `find.tpattern` identifies all or most recent pattern as defined in the pattern definition function `pattern.db`. The wrapper function `find.pattern` calls this for identifying the latest (both completed and forming) patterns and suitable for a sweep call over a period to identify.
+
+```{r}
+x <- quantmod::getSymbols("^NSEI",auto.assign = F)
+x <- x["2014-12-03::2015-12-03"]
+tpattern <- techchart::find.pattern(x)
+quantmod::chart_Series(x)
+quantmod::add_TA(tpattern$matches[[1]]$data,on=1,col=adjustcolor("red",alpha.f = 0.5), lwd=5)
+tpattern
+```
+
+These functions returns a list of objects of class patterns, which has a set of quantitative and descriptive parameters of the patterns found.

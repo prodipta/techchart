@@ -120,7 +120,7 @@ find.pattern <- function(x, pattern=pattern.db("HS")[[1]], tolerance=c(0.25,1),
         tryCatch({
           tpattern <- find.tpattern(y,pattern,tolerance[j],pip.tolerance[i], find.all = FALSE)
           if(NROW(tpattern$matches)>0){
-            tpattern$virtual <- TRUE
+            tpattern$matches[[1]]$type = "forming"
             return(tpattern)
           }
         }, error=function(e){}

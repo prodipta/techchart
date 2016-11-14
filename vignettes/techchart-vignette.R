@@ -40,3 +40,11 @@ quantmod::chart_Series(spx)
 quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1, lty=3, col="brown")
 quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1, lty=3, col="brown")
 
+## ------------------------------------------------------------------------
+x <- quantmod::getSymbols("^NSEI",auto.assign = F)
+x <- x["2014-12-03::2015-12-03"]
+tpattern <- techchart::find.pattern(x)
+quantmod::chart_Series(x)
+quantmod::add_TA(tpattern$matches[[1]]$data,on=1,col=adjustcolor("red",alpha.f = 0.5), lwd=5)
+tpattern
+
