@@ -5,4 +5,8 @@
 src/*.o
 src/*.so
 src/*.dll
+<<<<<<< HEAD
 techchart.Rproj
+=======
+inst/doc
+>>>>>>> 5c3756be7e4563eb19a6265ce570c0bc1ded31d3
