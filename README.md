@@ -4,7 +4,7 @@ The goal of this R package (techchart) is to provide a comprehensive set of tool
 
 ## Installation
 
-You can install bsoption from github with:
+You can install from github with:
 
 ```R
 # install.packages("devtools")
