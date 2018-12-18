@@ -126,19 +126,19 @@ tchannel
 quantmod::chart_Series(spx)
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-5-1.png" style="display: block; margin: auto;" />
 
 ``` r
 quantmod::add_TA(tchannel$xlines$maxlines[[1]],on=1, lty=3, col="brown")
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-5-2.png" style="display: block; margin: auto;" />
 
 ``` r
 quantmod::add_TA(tchannel$xlines$minlines[[1]],on=1, lty=3, col="brown")
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-5-3.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-5-3.png" style="display: block; margin: auto;" />
 
 The function returns an object with parameters of the envelopes found (if any), as well as the xts representation of the envelopes lines
 
@@ -155,13 +155,13 @@ tpattern <- techchart::find.pattern(x)
 quantmod::chart_Series(x)
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-6-1.png" style="display: block; margin: auto;" />
 
 ``` r
 quantmod::add_TA(tpattern$matches[[1]]$data,on=1,col=adjustcolor("red",alpha.f = 0.5), lwd=5)
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-6-2.png" style="display: block; margin: auto;" />
 
 ``` r
 tpattern
