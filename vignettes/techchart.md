@@ -34,7 +34,7 @@ points(as.numeric(imppts$maxima$pos),as.numeric(imppts$maxima$value),bg="green",
 points(as.numeric(imppts$minima$pos),as.numeric(imppts$minima$value),bg="red",pch=25,cex=1.25)
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 The function takes in a time series object (in xts format), and a tolerance level for extreme points identification (can be either a percentage or a multiple of standard deviation). It returns an object which has the list of all PIPs identified, marked by either a -1 (minima) or 1 (maxima), as well as the maxima and minima points separately as xts objects
 
@@ -64,19 +64,19 @@ summary(cpts)
 quantmod::chart_Series(spx)
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 ``` r
 quantmod::add_TA(cpts$segments[[1]],on=1,lty=3, col="red")
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-3-2.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-3-2.png" style="display: block; margin: auto;" />
 
 ``` r
 quantmod::add_TA(cpts$segments[[2]],on=1,lty=3, col="red")
 ```
 
-<img src="techchart_files/figure-markdown_github/unnamed-chunk-3-3.png" style="display: block; margin: auto;" />
+<img src="unnamed-chunk-3-3.png" style="display: block; margin: auto;" />
 
 Supports/ Resistance
 --------------------
