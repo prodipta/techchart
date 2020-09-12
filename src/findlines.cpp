@@ -6,7 +6,7 @@ using namespace Rcpp;
 double pi(){
   return(3.141593);
 }
-double abs(double x){
+double myabs(double x){
   if(x<0)return (-x);
   return x;
 }
